@@ -118,9 +118,9 @@ function Tooltip({ onClose }: { onClose: () => void }) {
       <h3 style={{ color: "orange" }}>Crumbs</h3>
       <ul style={{ listStyle: "none", padding: 0 }}>
         {!isFetched ? (
-          <li>Loading scrumbs...</li>
+          <li>Loading crumbs...</li>
         ) : comments.length === 0 ? (
-          <li>No scrumbs yet. Be the first!</li>
+          <li>No crumbs yet. Be the first!</li>
         ) : (
           comments.map((comment, index) => (
             <li
