@@ -31,10 +31,6 @@ function Tooltip({ onClose }: { onClose: () => void }) {
   const handleConnectOnClick = async (
     message: string = "Hello from the content script!"
   ) => {
-    // console.log({ href: location.href });
-
-    // const currentTabId = await getCurrentTabId();
-
     chrome.runtime.sendMessage(
       {
         message: "sendTransaction",
@@ -53,12 +49,12 @@ function Tooltip({ onClose }: { onClose: () => void }) {
     }, 5000);
   };
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (message: string) => {
     // Here you can add the code to send the message
     // For now, we'll just add it to the comments list
     setComments((prevComments) => [...prevComments, message]);
     setMessage("");
-    handleConnectOnClick();
+    handleConnectOnClick(message);
   };
 
   const loadComments = async () => {
@@ -77,6 +73,8 @@ function Tooltip({ onClose }: { onClose: () => void }) {
       functionName: "getCommentsByUrl",
       args: [url],
     });
+
+    console.log({ data });
 
     const dataResolved = data.map(keccakHashResolver);
 
@@ -144,7 +142,14 @@ function Tooltip({ onClose }: { onClose: () => void }) {
       <form
         onSubmit={(event) => {
           event.preventDefault();
-          handleSendMessage();
+
+          const message = (
+            event.target as unknown as { elements: Array<{ value: string }> }
+          ).elements[0]?.value;
+
+          console.log({ message });
+
+          handleSendMessage(message);
         }}
         style={{
           display: "flex",

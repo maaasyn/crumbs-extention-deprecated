@@ -112,6 +112,11 @@ chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
       ] as const;
 
       const currentTabId = tabs[0].id!;
+      const currentTabUrl = tabs[0].url!;
+
+      console.log({ currentTabId, currentTabUrl });
+
+      console.log({ urlHash: keccak256(toHex(currentTabUrl)) });
 
       const contract = getContract({
         abi: crumbs_contract_abi,
@@ -122,21 +127,24 @@ chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
         }),
       });
 
-      console.log({ contract });
+      // console.log({ contract });
 
       const encodedFn = encodeFunctionData({
         abi: contract.abi,
         functionName: "storeComment",
         args: [
-          keccak256(toHex("location.href")),
-          toHex((request?.data?.message as string) || "Hello", { size: 32 }),
+          keccak256(toHex(currentTabUrl)),
+          keccak256(toHex((request?.data?.message as string) || "Hello")),
         ],
       });
 
       chrome.scripting
         .executeScript({
+          args: [encodedFn, contract.address],
           target: { tabId: currentTabId },
-          func: async (encodedFn, contractAddress) => {
+          func: async (encodedFnData, contractAddress) => {
+            console.log({ location: location.href });
+
             console.log("executeScript");
 
             console.log({ "window.ethereum": window.ethereum });
@@ -166,7 +174,7 @@ chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
                 {
                   from: account,
                   to: contractAddress,
-                  data: encodedFn,
+                  data: encodedFnData,
                 },
               ],
             });
@@ -175,7 +183,6 @@ chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
             sendResponse({ tx });
           },
           world: "MAIN",
-          args: [encodedFn, contract.address],
         })
         .then((results) => {
           console.log({ results });
