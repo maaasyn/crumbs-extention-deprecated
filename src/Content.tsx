@@ -4,7 +4,6 @@ import { createPublicClient, http } from "viem";
 // import { sepolia } from "viem/chains";
 import maskotSvg from "./assets/maskot.svg";
 
-import { crumbsAbi } from "./crumbs-abi";
 import { keccakHashResolver } from "./hash-resolver";
 // import { config } from "./wagmi/config";
 // import "./index.css";
@@ -12,6 +11,7 @@ import { keccakHashResolver } from "./hash-resolver";
 import { QueryClientProvider } from "@tanstack/react-query";
 // import { http } from "wagmi";
 import { sepolia } from "wagmi/chains";
+import { crumbs_contract_abi } from "./contract/details";
 import { queryClient } from "./wagmi/react-query";
 
 const rootElement = document.createElement("div");
@@ -28,11 +28,37 @@ function Tooltip({ onClose }: { onClose: () => void }) {
     setMessage(event.target.value);
   };
 
-  const handleSendMessage = () => {
+  const handleConnectOnClick = async (
+    message: string = "Hello from the content script!"
+  ) => {
+    // console.log({ href: location.href });
+
+    // const currentTabId = await getCurrentTabId();
+
+    chrome.runtime.sendMessage(
+      {
+        message: "sendTransaction",
+        data: {
+          message,
+        },
+      },
+      function (response) {
+        console.log(response);
+      }
+    );
+
+    // wait 5 s
+    setTimeout(() => {
+      loadComments();
+    }, 5000);
+  };
+
+  const handleSendMessage = async () => {
     // Here you can add the code to send the message
     // For now, we'll just add it to the comments list
     setComments((prevComments) => [...prevComments, message]);
     setMessage("");
+    handleConnectOnClick();
   };
 
   const loadComments = async () => {
@@ -47,7 +73,7 @@ function Tooltip({ onClose }: { onClose: () => void }) {
 
     const data = await client.readContract({
       address: CRUMBS_ADDRESS_SEPOLIA,
-      abi: crumbsAbi,
+      abi: crumbs_contract_abi,
       functionName: "getCommentsByUrl",
       args: [url],
     });

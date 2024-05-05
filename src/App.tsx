@@ -105,6 +105,49 @@ function App() {
       <div className="card">
         <button onClick={fetchLatestBlock}>Fetch Latest Block</button>
         <button onClick={() => handleConnectOnClick()}>Connect</button>
+        <button
+          onClick={() => {
+            console.log("In the console log magic");
+            chrome.tabs.query(
+              { active: true, currentWindow: true },
+              function (tabs) {
+                chrome.scripting
+                  .executeScript({
+                    target: { tabId: tabs[0].id!, allFrames: true },
+                    func: async () => {
+                      let info;
+
+                      window.addEventListener(
+                        "eip6963:announceProvider",
+                        (event) => {
+                          console.log("event announceProvider");
+                          console.log({ event });
+                        }
+                      );
+
+                      window.dispatchEvent(
+                        new Event("eip6963:requestProvider")
+                      );
+
+                      window.removeEventListener(
+                        "eip6963:announceProvider",
+                        (event) => {
+                          console.log(event);
+                        }
+                      );
+                      return { info };
+                    },
+                    world: "MAIN",
+                  })
+                  .then((results) => {
+                    console.log("Results");
+                    console.log({ results });
+                  });
+              }
+            );
+          }}>
+          Console log some magic
+        </button>
         <p>Account: {account}</p>
         <p>Chain: {chain}</p>
         <p>Latest block: {block.toString()}</p>

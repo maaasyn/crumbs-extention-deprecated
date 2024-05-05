@@ -19,6 +19,10 @@
         "webRequest",
         "browserAction"
     ],
+    "background": {
+        "service_worker": "src/background.ts",
+        "type": "module"
+    },
     "host_permissions": [
         "https://*/*",
         "http://*/*"
