@@ -1,24 +1,14 @@
 {
     "manifest_version": 3,
     "name": "Crumbs",
-    "description": "Crumbs is a decentralized app (dApp) that lets you leave permanent, on-chain comments on any website. Engage in digital annotations across the web, viewable by all, creating a layer of communal interaction wherever you browse.",
+    "description": "Crumbs is a dApp that lets you leave and view permanent, on-chain comments on any website, enhancing communal web interaction.",
     "version": "0.0.1",
     "permissions": [
-        "clipboardWrite",
-        "notifications",
-        "storage",
-        "https://*/*",
-        "http://*/*",
         "activeTab",
-        "alarms",
-        "clipboardWrite",
-        "notifications",
         "tabs",
         "scripting",
         "webNavigation",
-        "storage",
-        "webRequest",
-        "browserAction"
+        "storage"
     ],
     "background": {
         "service_worker": "src/background.ts",
